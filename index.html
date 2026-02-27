@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Không Trùng</title>
+<title>Bảng 000-999</title>
 
 <style>
 body{
@@ -11,112 +11,88 @@ body{
   background:#0f172a;
   color:white;
   padding:20px;
+}
+
+h2{
   text-align:center;
 }
 
-input{
+.grid{
+  display:grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap:6px;
+}
+
+.cell{
   padding:8px;
-  width:120px;
-  border-radius:6px;
-  border:none;
   text-align:center;
-  margin:5px;
+  border-radius:6px;
+  background:#1e293b;
+  transition:0.2s;
 }
 
-button{
-  padding:10px 16px;
-  margin:5px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+.cell.highlight{
+  background:#facc15;
+  color:#000;
   font-weight:bold;
 }
 
-.generate{ background:#22c55e; }
-.copy{ background:#38bdf8; }
-.export{ background:#f59e0b; }
-
-textarea{
-  width:100%;
-  max-width:1000px;
-  height:250px;
-  margin-top:15px;
-  padding:12px;
-  border-radius:6px;
-  border:none;
-  resize:none;
-  background:#1e293b;
-  color:white;
-  font-size:13px;
+.cell:hover{
+  transform:scale(1.1);
 }
 </style>
 </head>
 
 <body>
 
-<h2>Tạo 1/2 tập số - Không trùng</h2>
-
-<label>Số chữ số:</label>
-<input type="number" id="digits" value="4" min="1">
-
-<br>
-
-<button class="generate" onclick="generateHalfUnique()">Tạo</button>
-<button class="copy" onclick="copyText()">Copy</button>
-<button class="export" onclick="exportTxt()">Xuất TXT</button>
-
-<br>
-<textarea id="output" placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
+<h2>Bảng số từ 000 → 999</h2>
+<div class="grid" id="grid"></div>
 
 <script>
 
-function generateHalfUnique(){
-  const digits = parseInt(document.getElementById("digits").value);
+const data = [
+"002","007","008","011","014","017","025","027","031","034","039","040","041","043","044","068","070","074","076","089","090","098",
+"006","072","080","071","059","088",
+"117","101","131","132","133","138","141","148","154","155","163","166","176","177","178","186","192",
+"122","136","198","149","152","115","129","124","137","181","144","195","165","199","123","108","104",
+"213","212","208","226","230","236","244","260","267","275","276","277","278","286","288","291","295","283","273","282",
+"210","207","265","297","229","205","263","246","290","249","274","262","266",
+"301","303","309","308","310","316","329","331","333","346","354","363","349","365","371","375","384","382","387","389",
+"300","319","304","322","311","327","372","377","324","321","379","390","305","367","338",
+"402","403","413","415","418","426","427","430","431","434","437","442","445","451","454","464","465","484",
+"489","496","494","410","469","457","412","432","400","463","479",
+"503","515","524","525","529","538","549","552","553","555","559","563","582","581","592","597",
+"512","532","575","594","547","506","576","546","513","580","557","586","577","510",
+"605","610","611","613","614","615","636","637","645","646","650","652","653","677","655","659","695",
+"631","634","654","612","658","690","670","647","698","684","626","639","668","687",
+"700","701","710","718","728","730","735","745","752","753","756","761","765","772","773","775","777",
+"721","726","783","782","733","774","740","778","788","746","785","758","797","791","779",
+"800","823","810","813","817","821","858","865","869","872","880","888","894","896","898","866",
+"832","829","812","820","843","844","804","854","856","852","808","842","828","863","897","879",
+"908","909","911","917","918","922","924","931","955","947","959","969","975","977","980","982","987","989",
+"991","995","999","994","988","978","957","912","951","971","985","961",
+"254","548","485","930","142","858","428","285","858",
+"863","461","374","458","982","827","276","768","688","886"
+];
 
-  if(!digits || digits <= 0){
-    alert("Nhập số hợp lệ.");
-    return;
+// Loại trùng và đảm bảo đủ 3 chữ số
+const dataSet = new Set(
+  data.map(n => n.padStart(3,"0"))
+);
+
+const grid = document.getElementById("grid");
+
+for(let i=0;i<=999;i++){
+  const num = i.toString().padStart(3,"0");
+  const div = document.createElement("div");
+  div.className="cell";
+  div.textContent=num;
+
+  if(dataSet.has(num)){
+    div.classList.add("highlight");
   }
 
-  const max = 10 ** digits;
-  const target = Math.floor(max / 2);
-
-  const set = new Set();
-
-  while(set.size < target){
-    const num = Math.floor(Math.random() * max)
-      .toString()
-      .padStart(digits,"0");
-    set.add(num);
-  }
-
-  const result = Array.from(set).map(n => `"${n}"`);
-  document.getElementById("output").value = result.join(",");
-}
-
-function copyText(){
-  const textarea = document.getElementById("output");
-  textarea.select();
-  textarea.setSelectionRange(0, 999999); 
-  document.execCommand("copy");
-  alert("Đã copy ✔");
-}
-
-function exportTxt(){
-  const content = document.getElementById("output").value;
-
-  if(!content){
-    alert("Chưa có dữ liệu.");
-    return;
-  }
-
-  const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(content);
-  const link = document.createElement("a");
-  link.setAttribute("href", dataStr);
-  link.setAttribute("download", "numbers.txt");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  grid.appendChild(div);
 }
 
 </script>
